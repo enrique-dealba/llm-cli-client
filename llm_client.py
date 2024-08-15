@@ -29,7 +29,8 @@ def generate(text):
     click.echo(json.dumps(response.json(), indent=2))
 
 
-@cli.command()
+@cli.command('process-skill')
+@cli.command('process_skill')
 @click.option(
     "--text",
     prompt="Enter skill to process",
