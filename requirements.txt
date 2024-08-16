@@ -1,3 +1,4 @@
 click
 requests
 pydantic_settings
+pytest
