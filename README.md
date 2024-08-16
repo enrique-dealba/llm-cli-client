@@ -49,25 +49,30 @@ llm-client generate --text "Your prompt here..."
 
 ## Configurations
 
-The default LLM server URL is `http://localhost:8888`. You can change this by setting the `LLM_SERVER_URL` environment variable:
-
-### On Linux or macOS:
+1. The default LLM server URL is `http://localhost:8888`. You can check this with:
 
 ```bash
-export LLM_SERVER_URL="http://your-server-url:port"
-python llm_client.py health
+llm-client get-url
 ```
 
-### On Windows:
+2. To set a new LLM server URL:
 
 ```bash
-set LLM_SERVER_URL=http://your-server-url:port
-python llm_client.py health
+llm-client set-url "http://your-server-url:port"
 ```
+
+After setting the URL, all subsequent commands will use the new URL automatically:
+
+```bash
+llm-client health
+```
+
+This checks the health of the server at the set URL.
+
 
 ## Tests
 
-1. To run the tests:
+1. To run the tests we use pytest:
 
 ```bash
 pytest tests/test_llm_client.py
