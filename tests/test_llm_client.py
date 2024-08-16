@@ -40,11 +40,19 @@ def test_process_skill_command():
 
 def test_get_url_command():
     """Tests get_url command."""
-    with patch("src.llm_client.config.load_config") as mock_load_config:
-        mock_load_config.return_value = {"LLM_SERVER_URL": "http://localhost:8888"}
-        result = runner.invoke(cli, ["get-url"])
-        assert result.exit_code == 0
-        assert "http://localhost:8888" in result.output
+    with patch("src.llm_client.config.Settings") as MockSettings:
+        # Create a mock Settings instance
+        mock_settings = MockSettings.return_value
+        
+        # Set the LLM_SERVER_URL attribute on the mock
+        mock_settings.LLM_SERVER_URL = "http://test-url:9999"
+        
+        # Patch the settings in the cli module
+        with patch("src.llm_client.cli.settings", mock_settings):
+            result = runner.invoke(cli, ["get-url"])
+            
+            assert result.exit_code == 0
+            assert "http://test-url:9999" in result.output
 
 
 def test_set_url_command():
@@ -56,6 +64,7 @@ def test_set_url_command():
             assert result.exit_code == 0
             assert "LLM server URL set to: http://new-llm-url:8888" in result.output
             mock_json_dump.assert_called_once()
+
             # Check that the correct URL was saved
             args, _ = mock_json_dump.call_args
             assert args[0]["LLM_SERVER_URL"] == "http://new-llm-url:8888"
