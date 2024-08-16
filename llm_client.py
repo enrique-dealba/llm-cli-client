@@ -1,9 +1,10 @@
 import json
+import os
 
 import click
 import requests
 
-BASE_URL = "http://localhost:8888"
+BASE_URL = os.getenv("LLM_SERVER_URL", "http://localhost:8888")
 
 
 @click.group()
@@ -14,9 +15,14 @@ def cli():
 
 @cli.command()
 def health():
-    """Check the health of the LLM server."""
-    response = requests.get(f"{BASE_URL}/health")
-    click.echo(response.json())
+    """Checks the health of the LLM server."""
+    try:
+        response = requests.get(f"{BASE_URL}/health")
+        response.raise_for_status()
+        click.echo(response.json())
+    except requests.RequestException as e:
+        click.echo(f"Error checking server health: {e}", err=True)
+        exit(1)
 
 
 @cli.command()
@@ -24,9 +30,14 @@ def health():
     "--text", prompt="Enter text to generate from", help="Input text for generation"
 )
 def generate(text):
-    """Generate text using the LLM."""
-    response = requests.post(f"{BASE_URL}/generate", json={"text": text})
-    click.echo(json.dumps(response.json(), indent=2))
+    """Generate general text using the LLM."""
+    try:
+        response = requests.post(f"{BASE_URL}/generate", json={"text": text})
+        response.raise_for_status()
+        click.echo(json.dumps(response.json(), indent=2))
+    except requests.RequestException as e:
+        click.echo(f"Error generating text: {e}", err=True)
+        exit(1)
 
 
 @cli.command("process-skill")
@@ -37,13 +48,17 @@ def generate(text):
 )
 def process_skill(text):
     """Process a spaceplan skill using the LLM."""
-    response = requests.post(f"{BASE_URL}/process_skill", json={"text": text})
-    click.echo(json.dumps(response.json(), indent=2))
+    try:
+        response = requests.post(f"{BASE_URL}/process_skill", json={"text": text})
+        response.raise_for_status()
+        click.echo(json.dumps(response.json(), indent=2))
+    except requests.RequestException as e:
+        click.echo(f"Error processing skill: {e}", err=True)
+        exit(1)
 
 
 # Alias for process-skill
 cli.add_command(process_skill, name="process_skill")
-
 
 if __name__ == "__main__":
     cli()
