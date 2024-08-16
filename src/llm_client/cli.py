@@ -1,10 +1,9 @@
 import json
-import os
 
 import click
 import requests
 
-from .config import settings
+from .config import save_config, settings
 
 
 @click.group()
@@ -17,8 +16,8 @@ def cli():
 @click.argument("url", type=str)
 def set_url(url: str):
     """Sets the LLM server URL."""
-    os.environ["LLM_SERVER_URL"] = url
     settings.LLM_SERVER_URL = url
+    save_config({"LLM_SERVER_URL": url})
     click.echo(f"LLM server URL set to: {url}")
 
 
