@@ -20,20 +20,20 @@ def test_health_command():
 def test_generate_command():
     """Tests generate command."""
     with patch("requests.post") as mock_post:
-        mock_post.return_value.json.return_value = {"generated_text": "Hello, world!"}
+        mock_post.return_value.json.return_value = {"generated_text": "Howdy, world!"}
         mock_post.return_value.raise_for_status.return_value = None
         result = runner.invoke(cli, ["generate"], input="Test prompt")
         assert result.exit_code == 0
-        assert "Hello, world!" in result.output
+        assert "Howdy, world!" in result.output
 
 
 def test_process_skill_command():
     """Tests process_skill command."""
     with patch("requests.post") as mock_post:
         mock_post.return_value.json.return_value = {
-            "processed_skill": "Skill processed"
+            "processed_skill": "Skill processed!"
         }
         mock_post.return_value.raise_for_status.return_value = None
         result = runner.invoke(cli, ["process-skill"], input="Test skill")
         assert result.exit_code == 0
-        assert "Skill processed" in result.output
+        assert "Skill processed!" in result.output
