@@ -1,10 +1,9 @@
 import json
-import os
 
 import click
 import requests
 
-BASE_URL = os.getenv("LLM_SERVER_URL", "http://localhost:8888")
+from config import settings
 
 
 @click.group()
@@ -17,7 +16,7 @@ def cli():
 def health():
     """Checks the health of the LLM server."""
     try:
-        response = requests.get(f"{BASE_URL}/health")
+        response = requests.get(f"{settings.LLM_SERVER_URL}/health")
         response.raise_for_status()
         click.echo(response.json())
     except requests.RequestException as e:
@@ -32,7 +31,9 @@ def health():
 def generate(text):
     """Generate general text using the LLM."""
     try:
-        response = requests.post(f"{BASE_URL}/generate", json={"text": text})
+        response = requests.post(
+            f"{settings.LLM_SERVER_URL}/generate", json={"text": text}
+        )
         response.raise_for_status()
         click.echo(json.dumps(response.json(), indent=2))
     except requests.RequestException as e:
@@ -49,7 +50,9 @@ def generate(text):
 def process_skill(text):
     """Process a spaceplan skill using the LLM."""
     try:
-        response = requests.post(f"{BASE_URL}/process_skill", json={"text": text})
+        response = requests.post(
+            f"{settings.LLM_SERVER_URL}/process_skill", json={"text": text}
+        )
         response.raise_for_status()
         click.echo(json.dumps(response.json(), indent=2))
     except requests.RequestException as e:
