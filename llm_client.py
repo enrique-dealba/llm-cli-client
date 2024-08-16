@@ -29,17 +29,18 @@ def generate(text):
     click.echo(json.dumps(response.json(), indent=2))
 
 
-@cli.command('process-skill')
-@cli.command('process_skill')
+@cli.command("process-skill")
 @click.option(
-    "--text",
-    prompt="Enter skill to process",
-    help="Input text for spaceplan skill processing",
+    "--text", prompt="Enter skill to process", help="Input text for skill processing"
 )
 def process_skill(text):
-    """Process a spaceplan skill using the LLM."""
+    """Process a skill using the LLM"""
     response = requests.post(f"{BASE_URL}/process_skill", json={"text": text})
     click.echo(json.dumps(response.json(), indent=2))
+
+
+# Alias for process-skill
+cli.add_command(process_skill, name="process_skill")
 
 
 if __name__ == "__main__":
