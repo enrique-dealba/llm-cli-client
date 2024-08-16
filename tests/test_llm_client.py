@@ -1,7 +1,6 @@
-from unittest.mock import patch
+from unittest.mock import mock_open, patch
 
 from click.testing import CliRunner
-
 from src.llm_client.cli import cli
 
 runner = CliRunner()
@@ -37,3 +36,43 @@ def test_process_skill_command():
         result = runner.invoke(cli, ["process-skill"], input="Test skill")
         assert result.exit_code == 0
         assert "Skill processed!" in result.output
+
+
+def test_get_url_command():
+    """Tests get_url command."""
+    with patch("src.llm_client.config.load_config") as mock_load_config:
+        mock_load_config.return_value = {"LLM_SERVER_URL": "http://localhost:8888"}
+        result = runner.invoke(cli, ["get-url"])
+        assert result.exit_code == 0
+        assert "http://localhost:8888" in result.output
+
+
+def test_set_url_command():
+    """Tests set_url command."""
+    m = mock_open()
+    with patch("src.llm_client.config.open", m):
+        with patch("json.dump") as mock_json_dump:
+            result = runner.invoke(cli, ["set-url", "http://new-llm-url:8888"])
+            assert result.exit_code == 0
+            assert "LLM server URL set to: http://new-llm-url:8888" in result.output
+            mock_json_dump.assert_called_once()
+            # Check that the correct URL was saved
+            args, _ = mock_json_dump.call_args
+            assert args[0]["LLM_SERVER_URL"] == "http://new-llm-url:8888"
+
+
+def test_url_persistence():
+    """Tests if set_url changes are reflected in subsequent get_url calls."""
+    m = mock_open()
+    with patch("src.llm_client.config.open", m):
+        with patch("json.dump") as mock_json_dump, patch(
+            "src.llm_client.config.load_config"
+        ) as mock_load_config:
+            # Sets the URL
+            runner.invoke(cli, ["set-url", "http://new-url:8080"])
+            mock_load_config.return_value = {"LLM_SERVER_URL": "http://new-url:8080"}
+
+            # Get new URL
+            result = runner.invoke(cli, ["get-url"])
+            assert result.exit_code == 0
+            assert "http://new-url:8080" in result.output
