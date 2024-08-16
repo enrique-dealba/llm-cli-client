@@ -3,7 +3,7 @@ import json
 import click
 import requests
 
-from config import settings
+from src.config import settings
 
 
 @click.group()
@@ -26,7 +26,7 @@ def health():
 
 @cli.command()
 @click.option(
-    "--text", prompt="Enter text to generate from", help="Input text for generation"
+    "--text", prompt="Enter text to prompt LLM", help="Input text for generation"
 )
 def generate(text):
     """Generate general text using the LLM."""

@@ -2,6 +2,11 @@
 
 ## Getting Started:
 
+0. Pip install:
+```bash
+pip install git+https://github.com/enrique-dealba/llm-cli-client.git
+```
+
 1. Clone the repo:
 ```bash
 git clone https://github.com/enrique-dealba/llm-cli-client.git

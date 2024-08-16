@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-client"
+version = "0.1.0"
+description = "CLI client for LLM Server"
+authors = [{ name = "Enrique De Alba", email = "enrique.dealba@e-o.solutions" }]
+readme = "README.md"
+requires-python = ">=3.7"
+dependencies = [
+    "click",
+    "requests",
+    "pydantic_settings",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.scripts]
+llm-client = "llm_client.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-v"
+testpaths = ["tests"]
