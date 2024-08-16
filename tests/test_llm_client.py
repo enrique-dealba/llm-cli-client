@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 from click.testing import CliRunner
 
-from src.cli import cli
+from src.llm_client.cli import cli
 
 runner = CliRunner()
 

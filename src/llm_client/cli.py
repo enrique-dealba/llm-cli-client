@@ -3,7 +3,7 @@ import json
 import click
 import requests
 
-from src.config import settings
+from src.llm_client.config import settings
 
 
 @click.group()
