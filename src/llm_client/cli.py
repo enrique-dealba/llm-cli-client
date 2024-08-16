@@ -1,4 +1,5 @@
 import json
+import os
 
 import click
 import requests
@@ -16,6 +17,7 @@ def cli():
 @click.argument("url", type=str)
 def set_url(url: str):
     """Sets the LLM server URL."""
+    os.environ["LLM_SERVER_URL"] = url
     settings.LLM_SERVER_URL = url
     click.echo(f"LLM server URL set to: {url}")
 
@@ -23,7 +25,7 @@ def set_url(url: str):
 @cli.command()
 def get_url():
     """Get current LLM server URL."""
-    click.echo(f"Current LLM server URL: {settings.LLM_SERVER_URL}")
+    click.echo(f"{settings.LLM_SERVER_URL}")
 
 
 @cli.command()
