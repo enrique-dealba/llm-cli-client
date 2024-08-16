@@ -2,19 +2,14 @@
 
 ## Getting Started:
 
-0. Pip install:
+1. Pip install:
 ```bash
 pip install git+https://github.com/enrique-dealba/llm-cli-client.git
 ```
 
-1. Clone the repo:
+2. How to use:
 ```bash
-git clone https://github.com/enrique-dealba/llm-cli-client.git
-```
-
-2. Install requirements:
-```bash
-pip install -r requirements.txt
+llm-client --help
 ```
 
 ## Usage:
@@ -22,7 +17,7 @@ pip install -r requirements.txt
 1. Check the health of the LLM server:
 
 ```bash
-python llm_client.py health
+llm-client health
 ```
 
 This should return `LLM is initialized and ready.`
@@ -30,15 +25,15 @@ This should return `LLM is initialized and ready.`
 2. Process a spaceplan skill:
 
 ```bash
-python llm_client.py process-skill --text "Track RSO target 28884 with sensors..."
+llm-client process-skill --text "Track RSO target 28884 with sensors..."
 ```
 
-Note: Both `python llm_client.py process-skill` and `python llm_client.py process_skill` work.
+Note: Both `llm_client.py process-skill` and `llm_client.py process_skill` work.
 
 2.1. Here's an example for a Periodic Revisit Objective prompt:
 
 ```bash
-python llm_client.py process_skill --text \
+llm-client process-skill --text \
 "Track RSO target 28884 with the sensors RME01 and RME02 in TEST mode \
 for a 36 hour plan, schedule four periodic revisits per hour and use 'U' markings. \
 Start at 2024-05-25 17:30:00.500000+00:00, end at 2024-05-26 22:30:00.250000+00:00. \
@@ -49,7 +44,7 @@ and patience to 30 mins"
 3. Generate general, unstructured text using the LLM:
 
 ```bash
-python llm_client.py generate --text "Your prompt here..."
+llm-client generate --text "Your prompt here..."
 ```
 
 ## Configurations
