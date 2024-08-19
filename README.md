@@ -28,7 +28,7 @@ This should return `LLM is initialized and ready.`
 llm-client process-skill --text "Track RSO target 28884 with sensors..."
 ```
 
-Note: Both `llm_client.py process-skill` and `llm_client.py process_skill` work.
+Note: Both `llm_client process-skill` and `llm_client process_skill` work.
 
 2.1. Here's an example for a Periodic Revisit Objective prompt:
 
