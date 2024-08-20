@@ -16,26 +16,45 @@ def test_health_command():
         assert "healthy" in result.output
 
 
-def test_generate_command():
-    """Tests generate command."""
+def test_generate_command_default():
+    """Tests generate command with default output."""
     with patch("requests.post") as mock_post:
-        mock_post.return_value.json.return_value = {"generated_text": "Howdy, world!"}
+        mock_post.return_value.json.return_value = {"text": "Howdy, world!"}
         mock_post.return_value.raise_for_status.return_value = None
         result = runner.invoke(cli, ["generate"], input="Test prompt")
-        assert result.exit_code == 0
-        assert "Howdy, world!" in result.output
+    assert result.exit_code == 0
+    assert "Howdy, world!" in result.output
+    assert '{"text":' not in result.output  # Ensure full JSON is not in output
 
-
-def test_process_skill_command():
-    """Tests process_skill command."""
+def test_generate_command_verbose():
+    """Tests generate command with verbose output."""
     with patch("requests.post") as mock_post:
-        mock_post.return_value.json.return_value = {
-            "processed_skill": "Skill processed!"
-        }
+        mock_post.return_value.json.return_value = {"text": "Howdy, world!", "extra": "data"}
+        mock_post.return_value.raise_for_status.return_value = None
+        result = runner.invoke(cli, ["generate", "--verbose"], input="Test prompt")
+    assert result.exit_code == 0
+    assert '"text": "Howdy, world!"' in result.output
+    assert '"extra": "data"' in result.output
+
+def test_process_skill_command_default():
+    """Tests process_skill command with default output."""
+    with patch("requests.post") as mock_post:
+        mock_post.return_value.json.return_value = {"text": "Skill processed!"}
         mock_post.return_value.raise_for_status.return_value = None
         result = runner.invoke(cli, ["process-skill"], input="Test skill")
-        assert result.exit_code == 0
-        assert "Skill processed!" in result.output
+    assert result.exit_code == 0
+    assert "Skill processed!" in result.output
+    assert '{"text":' not in result.output  # Ensure full JSON is not in output
+
+def test_process_skill_command_verbose():
+    """Tests process_skill command with verbose output."""
+    with patch("requests.post") as mock_post:
+        mock_post.return_value.json.return_value = {"text": "Skill processed!", "details": "Extra info!"}
+        mock_post.return_value.raise_for_status.return_value = None
+        result = runner.invoke(cli, ["process-skill", "--verbose"], input="Test skill")
+    assert result.exit_code == 0
+    assert '"text": "Skill processed!"' in result.output
+    assert '"details": "Extra info!"' in result.output
 
 
 def test_get_url_command():
