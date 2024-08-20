@@ -62,14 +62,14 @@ def test_get_url_command():
     with patch("src.llm_client.config.Settings") as MockSettings:
         # Create a mock Settings instance
         mock_settings = MockSettings.return_value
-        
+
         # Set the LLM_SERVER_URL attribute on the mock
         mock_settings.LLM_SERVER_URL = "http://test-url:9999"
-        
-        # Patch the settings in the cli module
-        with patch("src.llm_client.cli.settings", mock_settings):
+
+        # Patch the settings in the config module
+        with patch("src.llm_client.config.settings", mock_settings):
             result = runner.invoke(cli, ["get-url"])
-            
+
             assert result.exit_code == 0
             assert "http://test-url:9999" in result.output
 
