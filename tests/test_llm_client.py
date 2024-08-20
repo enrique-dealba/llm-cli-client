@@ -1,6 +1,8 @@
+import json
 from unittest.mock import mock_open, patch
 
 from click.testing import CliRunner
+
 from src.llm_client.cli import cli
 
 runner = CliRunner()
@@ -18,43 +20,78 @@ def test_health_command():
 
 def test_generate_command_default():
     """Tests generate command with default output."""
+    mock_response = {
+        "messages": [
+            {"content": "User prompt", "user": True},
+            {"content": "Howdy, world!", "user": False},
+        ]
+    }
     with patch("requests.post") as mock_post:
-        mock_post.return_value.json.return_value = {"text": "Howdy, world!"}
+        mock_post.return_value.json.return_value = mock_response
         mock_post.return_value.raise_for_status.return_value = None
         result = runner.invoke(cli, ["generate"], input="Test prompt")
+
     assert result.exit_code == 0
-    assert "Howdy, world!" in result.output
-    assert '{"text":' not in result.output  # Ensure full JSON is not in output
+    assert json.loads(result.output.strip()) == "Howdy, world!"
+    assert "messages" not in result.output  # Ensure full JSON is not in output
+
 
 def test_generate_command_verbose():
     """Tests generate command with verbose output."""
+    mock_response = {
+        "messages": [
+            {"content": "User prompt", "user": True},
+            {"content": "Howdy, world!", "user": False},
+        ],
+        "extra": "data",
+    }
     with patch("requests.post") as mock_post:
-        mock_post.return_value.json.return_value = {"text": "Howdy, world!", "extra": "data"}
+        mock_post.return_value.json.return_value = mock_response
         mock_post.return_value.raise_for_status.return_value = None
         result = runner.invoke(cli, ["generate", "--verbose"], input="Test prompt")
+
     assert result.exit_code == 0
-    assert '"text": "Howdy, world!"' in result.output
-    assert '"extra": "data"' in result.output
+    assert "Howdy, world!" in result.output
+    assert "extra" in result.output
+    assert json.loads(result.output.strip()) == mock_response
+
 
 def test_process_skill_command_default():
     """Tests process_skill command with default output."""
+    mock_response = {
+        "messages": [
+            {"content": "User skill", "user": True},
+            {"content": "Skill processed!", "user": False},
+        ]
+    }
     with patch("requests.post") as mock_post:
-        mock_post.return_value.json.return_value = {"text": "Skill processed!"}
+        mock_post.return_value.json.return_value = mock_response
         mock_post.return_value.raise_for_status.return_value = None
         result = runner.invoke(cli, ["process-skill"], input="Test skill")
+
     assert result.exit_code == 0
-    assert "Skill processed!" in result.output
-    assert '{"text":' not in result.output  # Ensure full JSON is not in output
+    assert json.loads(result.output.strip()) == "Skill processed!"
+    assert "messages" not in result.output  # Ensure full JSON is not in output
+
 
 def test_process_skill_command_verbose():
     """Tests process_skill command with verbose output."""
+    mock_response = {
+        "messages": [
+            {"content": "User skill", "user": True},
+            {"content": "Skill processed!", "user": False},
+        ],
+        "details": "Extra info!",
+    }
     with patch("requests.post") as mock_post:
-        mock_post.return_value.json.return_value = {"text": "Skill processed!", "details": "Extra info!"}
+        mock_post.return_value.json.return_value = mock_response
         mock_post.return_value.raise_for_status.return_value = None
         result = runner.invoke(cli, ["process-skill", "--verbose"], input="Test skill")
+
     assert result.exit_code == 0
-    assert '"text": "Skill processed!"' in result.output
-    assert '"details": "Extra info!"' in result.output
+    assert "Skill processed!" in result.output
+    assert "Extra info!" in result.output
+    assert json.loads(result.output.strip()) == mock_response
 
 
 def test_get_url_command():
