@@ -125,13 +125,11 @@ def test_process_skill_command_error():
     assert "Error processing skill: API error" in result.output
 
 
-def test_get_url_command():
-    """Tests get_url command."""
-    with patch("src.llm_client.config.settings", LLM_SERVER_URL="http://test-url:9999"):
-        result = runner.invoke(cli, ["get-url"])
-
-        assert result.exit_code == 0
-        assert "http://test-url:9999" in result.output
+def test_get_url_command(cli_runner):
+    """Tests get_url command for default URL."""
+    result = cli_runner.invoke(cli, ["get-url"])
+    assert result.exit_code == 0
+    assert "http://localhost:8888" in result.output
 
 
 def test_set_url_command():
