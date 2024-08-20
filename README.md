@@ -30,6 +30,12 @@ llm-client process-skill --text "Track RSO target 28884 with sensors..."
 
 Note: Both `llm_client process-skill` and `llm_client process_skill` work.
 
+By default, this will display only the content of the LLM response. To see the full JSON response, use the `--verbose` or `-v` flag:
+
+```bash
+llm-client process-skill --text "Track RSO target 28884 with sensors..." --verbose
+```
+
 2.1. Here's an example for a Periodic Revisit Objective prompt:
 
 ```bash
@@ -45,6 +51,12 @@ and patience to 30 mins"
 
 ```bash
 llm-client generate --text "Your prompt here..."
+```
+
+You can also use the `--verbose` flag with `generate`:
+
+```bash
+llm-client generate --text "Your prompt here..." --verbose
 ```
 
 ## Configurations
