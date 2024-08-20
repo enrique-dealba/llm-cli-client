@@ -54,7 +54,12 @@ def test_generate_command_verbose():
     assert result.exit_code == 0
     assert "Howdy, world!" in result.output
     assert "extra" in result.output
-    output_json = json.loads(result.output)
+
+    json_start = result.output.find("{")
+    json_end = result.output.rfind("}") + 1
+    json_str = result.output[json_start:json_end]
+
+    output_json = json.loads(json_str)
     assert output_json == mock_response
 
 
@@ -149,7 +154,7 @@ def test_url_persistence():
     """Tests if set_url changes are reflected in subsequent get_url calls."""
     m = mock_open()
     with patch("src.llm_client.config.open", m):
-        with patch("json.dump") as mock_json_dump, patch(
+        with patch("json.dump") as _, patch(
             "src.llm_client.config.load_config"
         ) as mock_load_config:
             # Sets the URL
