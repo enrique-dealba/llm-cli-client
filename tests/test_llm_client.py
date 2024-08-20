@@ -127,8 +127,7 @@ def test_process_skill_command_error():
 
 def test_get_url_command():
     """Tests get_url command."""
-    with patch("src.llm_client.cli.settings") as mock_settings:
-        mock_settings.LLM_SERVER_URL = "http://test-url:9999"
+    with patch("src.llm_client.config.settings", LLM_SERVER_URL="http://test-url:9999"):
         result = runner.invoke(cli, ["get-url"])
 
         assert result.exit_code == 0
