@@ -1,6 +1,7 @@
 import json
 from unittest.mock import mock_open, patch
 
+import requests
 from click.testing import CliRunner
 
 from src.llm_client.cli import cli
@@ -33,7 +34,7 @@ def test_generate_command_default():
 
     assert result.exit_code == 0
     assert "Howdy, world!" in result.output
-    assert "messages" not in result.output  # Ensure full JSON is not in output
+    assert "messages" not in result.output
 
 
 def test_generate_command_verbose():
@@ -72,8 +73,8 @@ def test_process_skill_command_default():
         result = runner.invoke(cli, ["process-skill"], input="Test skill\n")
 
     assert result.exit_code == 0
-    assert "Skill processed!" in result.output
-    assert "messages" not in result.output
+    assert "Skill processed!" in result.output.strip()
+    assert "messages" not in result.output  # Ensure full JSON is not in output
 
 
 def test_process_skill_command_verbose():
@@ -93,11 +94,17 @@ def test_process_skill_command_verbose():
         )
 
     assert result.exit_code == 0
-    assert "Skill processed!" in result.output
-    assert "Extra info!" in result.output
-    # Parse the JSON output, ignoring the prompt
-    output_json = json.loads(result.output.split("\n", 1)[1])
-    assert output_json == mock_response
+    assert json.loads(result.output.strip()) == mock_response
+
+
+def test_process_skill_command_error():
+    """Tests process_skill command with error response."""
+    with patch("requests.post") as mock_post:
+        mock_post.side_effect = requests.RequestException("API error")
+        result = runner.invoke(cli, ["process-skill"], input="Test skill\n")
+
+    assert result.exit_code == 1
+    assert "Error processing skill: API error" in result.output
 
 
 def test_get_url_command():
