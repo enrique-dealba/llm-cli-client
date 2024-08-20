@@ -94,7 +94,11 @@ def test_process_skill_command_verbose():
         )
 
     assert result.exit_code == 0
-    assert json.loads(result.output.strip()) == mock_response
+    assert "Skill processed!" in result.output
+    assert "Extra info!" in result.output
+    # Parse the JSON output, ignoring the prompt
+    output_json = json.loads(result.output.split("\n", 1)[1])
+    assert output_json == mock_response
 
 
 def test_process_skill_command_error():
