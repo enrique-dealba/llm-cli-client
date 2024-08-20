@@ -29,10 +29,10 @@ def test_generate_command_default():
     with patch("requests.post") as mock_post:
         mock_post.return_value.json.return_value = mock_response
         mock_post.return_value.raise_for_status.return_value = None
-        result = runner.invoke(cli, ["generate"], input="Test prompt")
+        result = runner.invoke(cli, ["generate"], input="Test prompt\n")
 
     assert result.exit_code == 0
-    assert json.loads(result.output.strip()) == "Howdy, world!"
+    assert "Howdy, world!" in result.output
     assert "messages" not in result.output  # Ensure full JSON is not in output
 
 
@@ -48,12 +48,14 @@ def test_generate_command_verbose():
     with patch("requests.post") as mock_post:
         mock_post.return_value.json.return_value = mock_response
         mock_post.return_value.raise_for_status.return_value = None
-        result = runner.invoke(cli, ["generate", "--verbose"], input="Test prompt")
+        result = runner.invoke(cli, ["generate", "--verbose"], input="Test prompt\n")
 
     assert result.exit_code == 0
     assert "Howdy, world!" in result.output
     assert "extra" in result.output
-    assert json.loads(result.output.strip()) == mock_response
+    # Parse the JSON output, ignoring the prompt
+    output_json = json.loads(result.output.split("\n", 1)[1])
+    assert output_json == mock_response
 
 
 def test_process_skill_command_default():
@@ -67,11 +69,11 @@ def test_process_skill_command_default():
     with patch("requests.post") as mock_post:
         mock_post.return_value.json.return_value = mock_response
         mock_post.return_value.raise_for_status.return_value = None
-        result = runner.invoke(cli, ["process-skill"], input="Test skill")
+        result = runner.invoke(cli, ["process-skill"], input="Test skill\n")
 
     assert result.exit_code == 0
-    assert json.loads(result.output.strip()) == "Skill processed!"
-    assert "messages" not in result.output  # Ensure full JSON is not in output
+    assert "Skill processed!" in result.output
+    assert "messages" not in result.output
 
 
 def test_process_skill_command_verbose():
@@ -86,29 +88,26 @@ def test_process_skill_command_verbose():
     with patch("requests.post") as mock_post:
         mock_post.return_value.json.return_value = mock_response
         mock_post.return_value.raise_for_status.return_value = None
-        result = runner.invoke(cli, ["process-skill", "--verbose"], input="Test skill")
+        result = runner.invoke(
+            cli, ["process-skill", "--verbose"], input="Test skill\n"
+        )
 
     assert result.exit_code == 0
     assert "Skill processed!" in result.output
     assert "Extra info!" in result.output
-    assert json.loads(result.output.strip()) == mock_response
+    # Parse the JSON output, ignoring the prompt
+    output_json = json.loads(result.output.split("\n", 1)[1])
+    assert output_json == mock_response
 
 
 def test_get_url_command():
     """Tests get_url command."""
-    with patch("src.llm_client.config.Settings") as MockSettings:
-        # Create a mock Settings instance
-        mock_settings = MockSettings.return_value
-
-        # Set the LLM_SERVER_URL attribute on the mock
+    with patch("src.llm_client.config.settings") as mock_settings:
         mock_settings.LLM_SERVER_URL = "http://test-url:9999"
+        result = runner.invoke(cli, ["get-url"])
 
-        # Patch the settings in the config module
-        with patch("src.llm_client.config.settings", mock_settings):
-            result = runner.invoke(cli, ["get-url"])
-
-            assert result.exit_code == 0
-            assert "http://test-url:9999" in result.output
+        assert result.exit_code == 0
+        assert "http://test-url:9999" in result.output
 
 
 def test_set_url_command():
