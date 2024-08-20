@@ -73,12 +73,15 @@ def generate(text: str, verbose: bool):
         data = response.json()
 
         if verbose:
-            click.echo(prettify_json(json.dumps(data)))
+            click.echo(json.dumps(data, indent=2))
         else:
             content = extract_last_ai_message(data)
-            click.echo(prettify_json(content))
+            click.echo(content)
     except requests.RequestException as e:
         click.echo(f"Error generating text: {e}", err=True)
+        exit(1)
+    except json.JSONDecodeError as e:
+        click.echo(f"Error parsing response: {e}", err=True)
         exit(1)
 
 
@@ -89,11 +92,7 @@ def generate(text: str, verbose: bool):
     help="Input text for spaceplan skill processing",
     type=str,
 )
-@click.option(
-    "--verbose", "-v",
-    is_flag=True,
-    help="Display full JSON response"
-)
+@click.option("--verbose", "-v", is_flag=True, help="Display full JSON response")
 def process_skill(text: str, verbose: bool):
     """Process a spaceplan skill using the LLM."""
     try:
@@ -102,14 +101,14 @@ def process_skill(text: str, verbose: bool):
         )
         response.raise_for_status()
         data = response.json()
-        
+
         if verbose:
             click.echo(json.dumps(data, indent=2))
         else:
-            messages = data.get('messages', [])
-            ai_messages = [msg for msg in messages if not msg.get('user', True)]
+            messages = data.get("messages", [])
+            ai_messages = [msg for msg in messages if not msg.get("user", True)]
             if ai_messages:
-                click.echo(ai_messages[-1].get('content', 'No content found'))
+                click.echo(ai_messages[-1].get("content", "No content found"))
             else:
                 click.echo("No AI response found")
     except requests.RequestException as e:

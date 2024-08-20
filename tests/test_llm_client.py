@@ -33,7 +33,7 @@ def test_generate_command_default():
         result = runner.invoke(cli, ["generate"], input="Test prompt\n")
 
     assert result.exit_code == 0
-    assert "Howdy, world!" in result.output
+    assert "Howdy, world!" in result.output.strip()
     assert "messages" not in result.output
 
 
@@ -54,9 +54,18 @@ def test_generate_command_verbose():
     assert result.exit_code == 0
     assert "Howdy, world!" in result.output
     assert "extra" in result.output
-    # Parse the JSON output, ignoring the prompt
-    output_json = json.loads(result.output.split("\n", 1)[1])
+    output_json = json.loads(result.output)
     assert output_json == mock_response
+
+
+def test_generate_command_error():
+    """Tests generate command with error response."""
+    with patch("requests.post") as mock_post:
+        mock_post.side_effect = requests.RequestException("API error")
+        result = runner.invoke(cli, ["generate"], input="Test prompt\n")
+
+    assert result.exit_code == 1
+    assert "Error generating text: API error" in result.output
 
 
 def test_process_skill_command_default():
