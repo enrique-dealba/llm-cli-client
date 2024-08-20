@@ -125,9 +125,10 @@ def test_process_skill_command_error():
     assert "Error processing skill: API error" in result.output
 
 
-def test_get_url_command(cli_runner):
+def test_get_url_command():
     """Tests get_url command for default URL."""
-    result = cli_runner.invoke(cli, ["get-url"])
+    result = runner.invoke(cli, ["get-url"])
+    
     assert result.exit_code == 0
     assert "http://localhost:8888" in result.output
 
