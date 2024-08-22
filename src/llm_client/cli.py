@@ -36,8 +36,8 @@ def extract_last_ai_message(response):
 
 def process_default_response(data):
     """Process the default response format."""
-    if isinstance(data, dict) and "text" in data:
-        return data["text"]
+    if isinstance(data, dict):
+        return data.get("text", json.dumps(data, indent=2))
     return json.dumps(data, indent=2)
 
 
@@ -156,54 +156,6 @@ def process_skill(text: str, verbose: bool, version3: bool):
 
 # Alias for process-skill
 cli.add_command(process_skill, name="process_skill")
-
-
-@cli.command()
-@click.option(
-    "--text",
-    prompt="Enter text for debug",
-    help="Input text for debug processing",
-    type=str,
-)
-def debug(text: str):
-    """Debug command to echo input and show additional debug info."""
-    click.echo("Debug command executed")
-    click.echo(f"Input text: {text}")
-    
-    try:
-        click.echo(f"LLM Server URL: {settings.LLM_SERVER_URL}")
-        
-        # Attempt to make a request to the server
-        response = requests.post(
-            f"{settings.LLM_SERVER_URL}/process_skill",
-            json={"text": text}
-        )
-        response.raise_for_status()
-        data = response.json()
-        
-        click.echo("Server response:")
-        click.echo(json.dumps(data, indent=2))
-        
-        if "text" in data:
-            click.echo("\nExtracted 'text' field:")
-            click.echo(data["text"])
-        else:
-            click.echo("\nNo 'text' field found in the response")
-        
-    except requests.RequestException as e:
-        click.echo(f"Error making request: {e}")
-    except json.JSONDecodeError as e:
-        click.echo(f"Error parsing JSON response: {e}")
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}")
-    
-    click.echo("\nDebug command completed")
-
-
-def register_commands():
-    cli.add_command(debug)
-
-register_commands()
 
 
 if __name__ == "__main__":
