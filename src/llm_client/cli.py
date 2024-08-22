@@ -200,10 +200,10 @@ def debug(text: str):
     click.echo("\nDebug command completed")
 
 
-# def register_commands():
-#     cli.add_command(debug)
+def register_commands():
+    cli.add_command(debug)
 
-# register_commands()
+register_commands()
 
 
 if __name__ == "__main__":
