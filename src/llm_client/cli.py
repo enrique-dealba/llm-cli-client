@@ -7,16 +7,10 @@ import requests
 from .config import save_config, settings
 
 
-def debug_print(message):
-    print(f"DEBUG: {message}", file=sys.stderr)
-
-
 @click.group()
 def cli():
     """CLI client for LLM Server."""
-    debug_print("Entering cli() function")
-    debug_print(f"Registered commands: {list(cli.commands.keys())}")
-    # pass
+    pass
 
 
 def prettify_json(json_str):
@@ -113,45 +107,32 @@ def generate(text: str, verbose: bool, version3: bool):
 @click.option("--version3", "-v3", is_flag=True, help="Use v0.0.3 output format")
 def process_skill(text: str, verbose: bool, version3: bool):
     """Process a spaceplan skill using the LLM."""
-    print("DEBUG: Entering process_skill function")
     try:
-        print(f"DEBUG: Sending request to {settings.LLM_SERVER_URL}/process_skill")
         response = requests.post(
             f"{settings.LLM_SERVER_URL}/process_skill", json={"text": text}
         )
         response.raise_for_status()
-        print(f"DEBUG: Received response with status code {response.status_code}")
         data = response.json()
-        print(f"DEBUG: Parsed JSON data: {data}")
         
         if verbose:
-            print("DEBUG: Verbose mode activated")
             click.echo(json.dumps(data, indent=2))
         elif version3:
-            print("DEBUG: Version3 mode activated")
             content = extract_last_ai_message(data)
             click.echo(content)
         else:
-            print("DEBUG: Default mode activated")
             if "text" in data:
-                print(f"DEBUG: 'text' field found in data")
                 click.echo(data["text"])
             else:
-                print(f"DEBUG: 'text' field not found in data. Available keys: {list(data.keys())}")
                 click.echo("No 'text' field found in the response")
     except requests.RequestException as e:
-        print(f"DEBUG: RequestException occurred: {e}")
         click.echo(f"Error processing skill: {e}", err=True)
         exit(1)
     except json.JSONDecodeError as e:
-        print(f"DEBUG: JSONDecodeError occurred: {e}")
         click.echo(f"Error parsing response: {e}", err=True)
         exit(1)
     except Exception as e:
-        print(f"DEBUG: Unexpected error occurred: {e}")
         click.echo(f"An unexpected error occurred: {e}", err=True)
         exit(1)
-    print("DEBUG: Exiting process_skill function")
 
 
 # Alias for process-skill
