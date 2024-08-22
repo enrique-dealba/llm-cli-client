@@ -28,12 +28,9 @@ def extract_last_ai_message(response):
 
 
 def process_default_response(data):
-    """Process the default response format (based on 0.0.2)."""
+    """Process the default response format."""
     if isinstance(data, dict) and "text" in data:
-        try:
-            return prettify_json(data["text"])
-        except json.JSONDecodeError:
-            return data["text"]
+        return data["text"]
     return json.dumps(data, indent=2)
 
 
