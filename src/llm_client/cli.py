@@ -1,4 +1,5 @@
 import json
+import sys
 
 import click
 import requests
@@ -6,10 +7,16 @@ import requests
 from .config import save_config, settings
 
 
+def debug_print(message):
+    print(f"DEBUG: {message}", file=sys.stderr)
+
+
 @click.group()
 def cli():
     """CLI client for LLM Server."""
-    pass
+    debug_print("Entering cli() function")
+    debug_print(f"Registered commands: {list(cli.commands.keys())}")
+    # pass
 
 
 def prettify_json(json_str):
@@ -191,6 +198,12 @@ def debug(text: str):
         click.echo(f"Unexpected error: {e}")
     
     click.echo("\nDebug command completed")
+
+
+# def register_commands():
+#     cli.add_command(debug)
+
+# register_commands()
 
 
 if __name__ == "__main__":
