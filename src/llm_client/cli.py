@@ -119,7 +119,11 @@ def process_skill(text: str, verbose: bool, version3: bool):
             content = extract_last_ai_message(data)
             click.echo(content)
         else:
-            click.echo(process_default_response(data))
+            # Default behavior
+            if "text" in data:
+                click.echo(data["text"])
+            else:
+                click.echo("No 'text' field found in the response")
     except requests.RequestException as e:
         click.echo(f"Error processing skill: {e}", err=True)
         exit(1)
