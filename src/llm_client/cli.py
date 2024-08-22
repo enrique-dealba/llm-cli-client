@@ -30,14 +30,7 @@ def extract_last_ai_message(response):
 def process_default_response(data):
     """Process the default response format."""
     if isinstance(data, dict) and "text" in data:
-        try:
-            # Parse the JSON string in the "text" field
-            parsed_text = json.loads(data["text"])
-            # Pretty-print the parsed JSON
-            return json.dumps(parsed_text, indent=2)
-        except json.JSONDecodeError:
-            # If it's not valid JSON, return the text as is
-            return data["text"]
+        return data["text"]
     return json.dumps(data, indent=2)
 
 
