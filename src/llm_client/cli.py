@@ -27,6 +27,16 @@ def extract_last_ai_message(response):
     return ""
 
 
+def process_default_response(data):
+    """Process the default response format (based on 0.0.2)."""
+    if isinstance(data, dict) and "text" in data:
+        try:
+            return prettify_json(data["text"])
+        except json.JSONDecodeError:
+            return data["text"]
+    return json.dumps(data, indent=2)
+
+
 @cli.command()
 @click.argument("url", type=str)
 def set_url(url: str):
@@ -63,7 +73,8 @@ def health():
     type=str,
 )
 @click.option("--verbose", "-v", is_flag=True, help="Display full JSON response")
-def generate(text: str, verbose: bool):
+@click.option("--version3", "-v3", is_flag=True, help="Use v0.0.3 output format")
+def generate(text: str, verbose: bool, version3: bool):
     """Generate general text using the LLM."""
     try:
         response = requests.post(
@@ -74,9 +85,11 @@ def generate(text: str, verbose: bool):
 
         if verbose:
             click.echo(json.dumps(data, indent=2))
-        else:
+        elif version3:
             content = extract_last_ai_message(data)
             click.echo(content)
+        else:
+            click.echo(process_default_response(data))
     except requests.RequestException as e:
         click.echo(f"Error generating text: {e}", err=True)
         exit(1)
@@ -93,7 +106,8 @@ def generate(text: str, verbose: bool):
     type=str,
 )
 @click.option("--verbose", "-v", is_flag=True, help="Display full JSON response")
-def process_skill(text: str, verbose: bool):
+@click.option("--version3", "-v3", is_flag=True, help="Use v0.0.3 output format")
+def process_skill(text: str, verbose: bool, version3: bool):
     """Process a spaceplan skill using the LLM."""
     try:
         response = requests.post(
@@ -104,13 +118,11 @@ def process_skill(text: str, verbose: bool):
 
         if verbose:
             click.echo(json.dumps(data, indent=2))
+        elif version3:
+            content = extract_last_ai_message(data)
+            click.echo(content)
         else:
-            messages = data.get("messages", [])
-            ai_messages = [msg for msg in messages if not msg.get("user", True)]
-            if ai_messages:
-                click.echo(ai_messages[-1].get("content", "No content found"))
-            else:
-                click.echo("No AI response found")
+            click.echo(process_default_response(data))
     except requests.RequestException as e:
         click.echo(f"Error processing skill: {e}", err=True)
         exit(1)
